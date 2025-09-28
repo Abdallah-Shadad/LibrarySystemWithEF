@@ -22,17 +22,8 @@ Release/
 *.mdb
 
 # Entity Framework
-Migrations/obj/
 *.dbmdl
 *.dbproj.schemaview
-
-# NuGet packages
-*.nupkg
-*.snupkg
-packages/
-*.nuspec
-*.dll
-*.exe
 
 # Cache
 *.cache
