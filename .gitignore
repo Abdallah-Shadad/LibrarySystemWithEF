@@ -1,0 +1,50 @@
+# Ignore build results
+bin/
+obj/
+out/
+Debug/
+Release/
+
+# Visual Studio files
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Visual Studio Code
+.vscode/
+
+# Backup and log files
+*.log
+*.tlog
+*.pdb
+*.mdb
+
+# Entity Framework
+Migrations/obj/
+*.dbmdl
+*.dbproj.schemaview
+
+# NuGet packages
+*.nupkg
+*.snupkg
+packages/
+*.nuspec
+*.dll
+*.exe
+
+# Cache
+*.cache
+*.temp
+*.tmp
+
+# OS generated files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+.DS_Store
+
+# Secrets / config
+appsettings.Development.json
+appsettings.Local.json
