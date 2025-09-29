@@ -21,7 +21,7 @@ namespace LibrarySystemWithEF.Models
         public Book Book { get; set; }
 
         [Required]
-        public DateTime BorrowDate { get; set; } = DateTime.Now;
+        public DateTime BorrowDate { get; set; }
 
         public DateTime? ReturnDate { get; set; }
 

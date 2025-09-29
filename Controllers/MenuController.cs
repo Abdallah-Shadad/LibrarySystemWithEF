@@ -19,8 +19,6 @@ namespace LibrarySystemWithEF
             Console.ReadKey();
         }
 
-
-
         public MenuController(UserService userService, BookService bookService, BorrowingService borrowingService)
         {
             _userService = userService;
@@ -47,7 +45,10 @@ namespace LibrarySystemWithEF
                     case "2": ListBooks(); Pause(); break;
                     case "3": BorrowBook(); Pause(); break;
                     case "4": ReturnBook(); Pause(); break;
-                    case "5": exit = true; break;
+                    case "6": SearchBook(); Pause(); break;
+                    case "7": ViewMyBorrowedBooks(); Pause(); break;
+                    case "8": RunSettings(); break;
+                    case "0": exit = true; break;
                     default:
                         ConsoleView.ShowMessage("Invalid choice. Try again.", ConsoleColor.Yellow);
                         Pause();
@@ -68,7 +69,7 @@ namespace LibrarySystemWithEF
                 {
                     case "1": Login(); break;
                     case "2": SignUp(); break;
-                    case "3": Environment.Exit(0); break;
+                    case "0": Environment.Exit(0); break;
                     default:
                         ConsoleView.ShowMessage("Invalid choice.", ConsoleColor.Yellow);
                         Pause();
@@ -208,6 +209,155 @@ namespace LibrarySystemWithEF
             {
                 ConsoleView.ShowMessage(ex.Message, ConsoleColor.Red);
             }
+        }
+
+        private void SearchBook()
+        {
+            Console.Write("Enter book title or author to search: ");
+            var keyword = Console.ReadLine()?.Trim().ToLower();
+
+            if (string.IsNullOrEmpty(keyword))
+            {
+                ConsoleView.ShowMessage("Search keyword cannot be empty.", ConsoleColor.Yellow);
+                return;
+            }
+
+            var results = _bookService.GetAllBooks()
+                .Where(b => b.Title.ToLower().Contains(keyword) || b.Author.ToLower().Contains(keyword))
+                .ToList();
+
+            if (!results.Any())
+            {
+                ConsoleView.ShowMessage("No books found matching your search.", ConsoleColor.Red);
+                return;
+            }
+
+            Console.WriteLine("Search Results:");
+            foreach (var book in results)
+                Console.WriteLine($"{book.BookId} - {book.Title} by {book.Author}");
+        }
+
+        private void ViewMyBorrowedBooks()
+        {
+            var myBorrowings = _borrowingService.GetUserBorrowings(_currentUser.UserId);
+
+            if (!myBorrowings.Any())
+            {
+                ConsoleView.ShowMessage("You have not borrowed any books.", ConsoleColor.Yellow);
+                return;
+            }
+
+            Console.WriteLine("My Borrowed Books:");
+            foreach (var b in myBorrowings)
+            {
+                var book = _bookService.GetBookById(b.BookId);
+                Console.WriteLine($"{book.BookId} - {book.Title} (Borrowed on {b.BorrowDate.ToShortDateString()})");
+            }
+        }
+
+        // =========================
+        // Settings
+        // =========================
+        private void RunSettings()
+        {
+            bool back = false;
+            while (!back)
+            {
+                Console.Clear();
+                Console.WriteLine("===== Settings =====");
+                Console.WriteLine("1. Change Full Name");
+                Console.WriteLine("2. Change Email");
+                Console.WriteLine("3. Change Password");
+                Console.WriteLine("0. Back to Main Menu");
+                Console.Write("Choose an option: ");
+
+                var choice = Console.ReadLine()?.Trim();
+
+                switch (choice)
+                {
+                    case "1": ChangeFullName(); break;
+                    case "2": ChangeEmail(); break;
+                    case "3": ChangePassword(); break;
+                    case "0": back = true; break;
+                    default:
+                        ConsoleView.ShowMessage("Invalid choice. Try again.", ConsoleColor.Yellow);
+                        Pause();
+                        break;
+                }
+            }
+        }
+
+       
+        private bool ConfirmCurrentPassword()
+        {
+            string currentPassword = ConsoleView.ReadInput("Enter current password to confirm: ");
+            if (_currentUser.Password != currentPassword)
+            {
+                ConsoleView.ShowMessage("Password is incorrect! Access denied.", ConsoleColor.Red);
+                Pause();
+                return false;
+            }
+            return true;
+        }
+
+        private void ChangeFullName()
+        {
+            if (!ConfirmCurrentPassword()) return;
+
+            string newFullName = ConsoleView.ReadInput("Enter new full name: ");
+            _currentUser.FullName = newFullName;
+            _userService.UpdateUser(_currentUser);
+            ConsoleView.ShowMessage("Full name updated successfully!");
+            Pause();
+        }
+
+        private void ChangeEmail()
+        {
+            if (!ConfirmCurrentPassword()) return;
+
+            string newEmail;
+            do
+            {
+                newEmail = ConsoleView.ReadInput("Enter new email: ");
+                if (!ConsoleView.IsValidEmail(newEmail))
+                {
+                    ConsoleView.ShowMessage("Invalid email format! Please try again.", ConsoleColor.Red);
+                    continue;
+                }
+                if (_userService.GetAllUsers().Any(u => u.Email == newEmail && u.UserId != _currentUser.UserId))
+                {
+                    ConsoleView.ShowMessage("Email already exists!", ConsoleColor.Red);
+                    continue;
+                }
+                break;
+            } while (true);
+
+            _currentUser.Email = newEmail;
+            _userService.UpdateUser(_currentUser);
+            ConsoleView.ShowMessage("Email updated successfully!");
+            Pause();
+        }
+
+        private void ChangePassword()
+        {
+            if (!ConfirmCurrentPassword()) return;
+
+            string newPassword;
+            do
+            {
+                newPassword = ConsoleView.ReadInput("Enter new password: ");
+                if (!ConsoleView.IsValidPassword(newPassword))
+                {
+                    ConsoleView.ShowMessage("Password must be at least 6 characters, contain at least one letter and one number.", ConsoleColor.Red);
+                    continue;
+                }
+                break;
+            } while (true);
+
+            _currentUser.Password = newPassword;
+            _userService.UpdateUser(_currentUser);
+            ConsoleView.ShowMessage("Password updated successfully!");
+            Pause();
         }
 
 

@@ -38,14 +38,44 @@ namespace LibrarySystemWithEF.Services.Implementations
         public User? Register(string fullName, string email, string password)
         {
             if (_context.Users.Any(u => u.Email == email))
-            {
                 throw new Exception("Email already exists!");
-            }
 
             var user = new User(fullName, email, password);
             _context.Users.Add(user);
             _context.SaveChanges();
             return user;
+        }
+
+        public bool VerifyPassword(User user, string password)
+        {
+            return user.Password == password;
+        }
+
+
+
+        public void UpdateUser(User updatedUser)
+        {
+            var existingUser = _context.Users.FirstOrDefault(u => u.UserId == updatedUser.UserId);
+            if (existingUser == null)
+                throw new Exception("User not found.");
+
+            // update fields
+            existingUser.FullName = updatedUser.FullName;
+            existingUser.Email = updatedUser.Email;
+            existingUser.Password = updatedUser.Password;
+
+            _context.SaveChanges();
+        }
+
+
+        public void DeleteUser(int userId)
+        {
+            var user = _context.Users.FirstOrDefault(u => u.UserId == userId);
+            if (user == null)
+                throw new Exception("User not found.");
+
+            _context.Users.Remove(user);
+            _context.SaveChanges();
         }
     }
 }

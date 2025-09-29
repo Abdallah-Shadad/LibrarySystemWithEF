@@ -18,7 +18,7 @@ namespace LibrarySystemWithEF.Models
         public bool IsAvailable { get; set; } = true;
         public ICollection<Borrowing> Borrowings { get; set; }
 
-
+        public Book() { }
         public Book(string title, string author, int year)
         {
             Title = title;
