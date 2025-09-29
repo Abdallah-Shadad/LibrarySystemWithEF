@@ -35,7 +35,7 @@ namespace LibrarySystemWithEF.Models
 
         public override string ToString()
         {
-            return $"User: {FullName} ({Email})";
+            return $"User [{UserId}] : {FullName} ({Email})";
         }
     }
 

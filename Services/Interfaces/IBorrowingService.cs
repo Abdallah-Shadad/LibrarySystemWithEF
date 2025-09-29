@@ -7,6 +7,6 @@ namespace LibrarySystemWithEF.Services.Interfaces
     {
         List<Borrowing> GetAllBorrowings();
         void BorrowBook(int userId, int bookId);
-        void ReturnBook(int borrowingId);
+        void ReturnBook(int userId, int bookId);
     }
 }
